@@ -20,10 +20,9 @@
     document.cookie = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
   }
 
-  /* ---------------- fake / placeholder GA injection ---------------- */
+  /* ---------------- Google Analytics (gtag.js) injection ---------------- */
   function injectGoogleAnalytics() {
-    // REPLACE_WITH_YOUR_MEASUREMENT_ID — swap in your real GA4 property ID.
-    const GA_ID = 'G-XXXXXXXXXX';
+    const GA_ID = 'G-NFC3M5EDVM';
     if (document.getElementById('ga-gtag-script')) return;
 
     const s1 = document.createElement('script');
