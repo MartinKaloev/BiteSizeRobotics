@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Martin Kaloev — Library of Bite Size Robotics</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= PERSISTENT BACKGROUND CRAWLER SWARM ================= -->
+<canvas id="bgCrawlCanvas" class="bg-crawl-canvas"></canvas>
+
+<!-- ================= NAV / SCROLL TRACK ================= -->
+<nav class="navtrack" id="navtrack" aria-label="Section navigation">
+  <div class="navtrack-bar"></div>
+  <button class="navrung active" data-target="section-clock" data-label="Clock &amp; Algorithm Wheel" aria-label="Clock"></button>
+  <button class="navrung" data-target="section-ide" data-label="Attention-Based DRL" aria-label="Attention DRL"></button>
+  <button class="navrung" data-target="section-cnn" data-label="Computer Vision" aria-label="Computer Vision"></button>
+  <button class="navrung" data-target="section-pub" data-label="Publications" aria-label="Publications"></button>
+  <button class="navrung" data-target="section-downloads" data-label="Code Downloads" aria-label="Code Downloads"></button>
+  <button class="navrung" data-target="section-robots" data-label="Robots Welcome" aria-label="Robots Welcome"></button>
+  <div class="navflash" id="navFlash"></div>
+</nav>
+
+<main class="scroller" id="scroller">
+
+  <!-- ================= 1. NAME + CLOCK / WHEEL ================= -->
+  <section class="slide" id="section-clock">
+    <div class="clock-bg-grid"></div>
+
+    <div class="clock-name-block">
+      <h1 class="clock-name">Martin Kaloev</h1>
+      <p class="clock-name-sub">Library of Bite Size Robotics</p>
+    </div>
+
+    <h2 class="section-label">01 · Countdown &amp; Weekly Algorithm Wheel</h2>
+
+    <p class="clock-intro-text">Hi, this is my web-lab — a STEM education lab in my field, Deep Reinforcement Learning. Those little bots crawling around are friendly animated indexers, modeled after the AI crawlers that collect information across the web.</p>
+
+    <div class="clock-widget-container">
+      <div class="clock-flipper" id="clockFlipper">
+
+        <!-- FRONT: DIGITAL COUNTDOWN CLOCK -->
+        <div class="clock-circle-card clock-clock-side">
+          <div class="clock-header">Sofia, BG • Countdown</div>
+          <div class="clock-timer-display" id="clockText">--days:--h:--m:--s</div>
+          <div class="clock-timer-sub">Target: Nov 11, 2026 12:00 EET</div>
+          <div class="clock-swap-bar-wrap">
+            <div class="clock-swap-bar" id="clockSwapBar"></div>
+          </div>
+        </div>
+
+        <!-- BACK: GAME SHOW PRIZE WHEEL -->
+        <div class="clock-circle-card clock-wheel-side">
+          <div class="clock-left-pointer" id="clockPointer"></div>
+          <div class="clock-speech-bubble" id="clockWheelBubble">SPIN FOR THIS WEEK'S ALGORITHM!</div>
+          <canvas id="clockWheelCanvas" width="320" height="320"></canvas>
+          <button class="clock-center-spin-btn" id="clockSpinBtn">SPIN</button>
+          <a class="clock-reveal-btn" id="clockRevealBtn" href="https://www.youtube.com/@BiteSizeRobotics" target="_blank" rel="noopener">▶ Watch on YouTube</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 2. ATTENTION-BASED DRL / IDE ================= -->
+  <section class="slide" id="section-ide">
+    <h2 class="section-label">02 · Attention-Based Deep RL</h2>
+
+    <div class="ide-bg-grid"></div>
+
+    <div class="ide-split-layout">
+
+      <!-- LEFT: PSEUDO IDE -->
+      <div class="ide-half">
+        <div class="ide-header">
+          <div class="ide-window-dots">
+            <div class="ide-dot ide-dot-red"></div>
+            <div class="ide-dot ide-dot-yellow"></div>
+            <div class="ide-dot ide-dot-green"></div>
+          </div>
+          <div class="ide-file-tab" id="ideFileTab">⚡ transformer_jax.py</div>
+          <div class="ide-timer-tag" id="ideTimer">Retype: 10s</div>
+        </div>
+        <div class="ide-body">
+          <div class="ide-line-numbers" id="ideLineNumbers">1</div>
+          <div class="ide-code-content"><span id="ideTypedCode"></span><span class="ide-cursor"></span></div>
+        </div>
+      </div>
+
+      <!-- RIGHT: FLIPPING EXPLANATION / GIF CARD -->
+      <div class="ide-showcase-half">
+        <div class="ide-flipper-card" id="ideFlipperCard">
+
+          <div class="ide-card-face ide-card-front ide-card-gif">
+            <div class="ide-gif-container">
+              <img src="animation.gif" alt="Attention DRL visual" id="ideGifImg">
+            </div>
+          </div>
+
+          <div class="ide-card-face ide-card-back ide-card-text">
+            <h2>🧠 ATTENTION-BASED DRL</h2>
+            <p>Attention-based Deep RL treats an agent's trajectory — states, actions, rewards over time — as a <em>sequence</em>, and uses self-attention (à la Decision Transformer) so the policy can attend over its own past context to decide the next action, instead of relying only on the current state.</p>
+            <div class="ide-card-badge">[ FLIPPING IN 5s ]</div>
+          </div>
+
+        </div>
+
+        <div class="ide-swap-indicator-wrap">
+          <span>NEXT FLIP</span>
+          <div class="ide-swap-progress-track">
+            <div class="ide-swap-progress-fill" id="ideSwapProgress"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 3. COMPUTER VISION / CNN ZOOM ================= -->
+  <section class="slide" id="section-cnn">
+    <h2 class="section-label">03 · Computer Vision</h2>
+
+    <div class="cnn-bg-grid"></div>
+
+    <div class="cnn-stage">
+      <div class="cnn-matrix" id="cnnMatrix">
+        <div class="cnn-grid-line-h1"></div>
+        <div class="cnn-grid-line-h2"></div>
+        <div class="cnn-grid-line-v1"></div>
+        <div class="cnn-grid-line-v2"></div>
+
+        <div class="cnn-cell">[0, 0]</div>
+        <div class="cnn-cell">[0, 1]</div>
+        <div class="cnn-cell">[0, 2]</div>
+
+        <div class="cnn-cell">[1, 0]</div>
+        <div class="cnn-cell cnn-mid-sqr" id="cnnMidSquare">MID SQR</div>
+        <div class="cnn-cell">[1, 2]</div>
+
+        <div class="cnn-cell">[2, 0]</div>
+        <div class="cnn-cell">[2, 1]</div>
+        <div class="cnn-cell">[2, 2]</div>
+      </div>
+
+      <div class="cnn-telemetry-overlay" id="cnnTelemetryCard">
+        <div class="cnn-header-bar">
+          <span>CNN KERNEL ROI [1, 1]</span>
+          <span>EXTRACTED</span>
+        </div>
+        <div class="cnn-data-line" id="cnnLine1">
+          <span class="cnn-key">RGB:</span> [ 142, 204, 255 ]
+        </div>
+        <div class="cnn-data-line" id="cnnLine2">
+          <span class="cnn-key">HSV:</span> [ 207°, 44%, 100% ]
+        </div>
+        <div class="cnn-data-line" id="cnnLine3">
+          <span class="cnn-key">IoM:</span> 0.978 &nbsp;|&nbsp; <span class="cnn-key">IoU:</span> 0.942
+        </div>
+        <div class="cnn-data-line" id="cnnLine4">
+          <div class="cnn-highlight">Hu moments (7-vector):</div>
+          <div class="cnn-hu-vector">
+            [ 1.667e-01, 3.695e-12, 1.154e-13, 1.283e-14, 4.644e-28, -2.429e-20, -1.672e-28 ]
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cnn-status-tag" id="cnnStatusTag">STATE: SCANNING 3x3 MATRIX</div>
+    <p class="cnn-soon-note">🔬 Coming soon: my computer vision research.</p>
+  </section>
+
+  <!-- ================= 4. PUBLICATIONS / BI-CURVES ================= -->
+  <section class="slide" id="section-pub">
+    <h2 class="section-label">04 · Publications</h2>
+
+    <div class="pub-layout">
+      <div class="pub-viewport-container">
+        <div class="pub-hud-overlay">
+          <h1>3D Distribution Plane (X, Y, Z)</h1>
+          <p>• Drag mouse to orbit/rotate • Morphing distribution every 3s</p>
+        </div>
+        <div class="pub-legend-box">
+          <div class="pub-legend-item"><span class="pub-dot-cyan"></span> Distribution Curve α (Primary Bell)</div>
+          <div class="pub-legend-item"><span class="pub-dot-pink"></span> Distribution Curve β (Secondary Skew)</div>
+        </div>
+        <canvas id="pubWebglCanvas"></canvas>
+      </div>
+
+      <div class="pub-sidebar">
+        <div class="pub-sidebar-header">
+          <h2>📄 Publications</h2>
+          <span>Selected Research Papers</span>
+        </div>
+
+        <a href="https://ieeexplore.ieee.org/abstract/document/9461312" target="_blank" rel="noopener" class="pub-paper-btn">
+          <div class="pub-paper-tag"><span>DOI: 10.1109/HORA52670.2021.9461312</span><span>PDF ↗</span></div>
+          <div class="pub-paper-title">Comparative Analysis of Activation Functions Used in the Hidden Layers of Deep Neural Networks</div>
+        </a>
+
+        <a href="https://ieeexplore.ieee.org/abstract/document/9604690" target="_blank" rel="noopener" class="pub-paper-btn">
+          <div class="pub-paper-tag"><span>DOI: 10.1109/ISMSIT52890.2021.9604690</span><span>PDF ↗</span></div>
+          <div class="pub-paper-title">Experiments Focused on Exploration in Deep Reinforcement Learning</div>
+        </a>
+
+        <a href="https://ieeexplore.ieee.org/abstract/document/10391644" target="_blank" rel="noopener" class="pub-paper-btn">
+          <div class="pub-paper-tag"><span>DOI: 10.1109/ISAS60782.2023.10391644</span><span>PDF ↗</span></div>
+          <div class="pub-paper-title">Tailored Learning Rates for Reinforcement Learning: A Visual Exploration and Guideline Formulation</div>
+        </a>
+
+        <a href="https://ieeexplore.ieee.org/abstract/document/10378830" target="_blank" rel="noopener" class="pub-paper-btn">
+          <div class="pub-paper-tag"><span>DOI: 10.1109/CIEES58940.2023.10378830</span><span>PDF ↗</span></div>
+          <div class="pub-paper-title">Comprehensive Review of Benefits from the Use of Sparse Updates Techniques in Reinforcement Learning: Experimental Simulations in Complex Action Space Environments</div>
+        </a>
+
+        <a href="https://ieeexplore.ieee.org/abstract/document/10304968" target="_blank" rel="noopener" class="pub-paper-btn">
+          <div class="pub-paper-tag"><span>DOI: 10.1109/ISMSIT58785.2023.10304968</span><span>PDF ↗</span></div>
+          <div class="pub-paper-title">Comprehensive Review of Benefits from the Use of Neuron Connection Pruning Techniques During the Training Process of Artificial Neural Networks in Reinforcement Learning: Experimental Simulations in Atari Games</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 5. CODE DOWNLOADS ================= -->
+  <section class="slide" id="section-downloads">
+    <h2 class="section-label">05 · Code Downloads</h2>
+
+    <div class="dl-bg-grid"></div>
+
+    <div class="dl-header">
+      <h1>Algorithm Code Downloads</h1>
+      <p>The DRL notebooks behind each "Algorithm of the Week" — real Jupyter notebooks, password-protected.</p>
+    </div>
+
+    <div class="dl-grid">
+      <a class="dl-btn" href="downloads/drl-algo-1.7z" download>
+        <span class="dl-btn-icon">⬇</span>
+        <span class="dl-btn-label">DRL Algorithm #1</span>
+        <span class="dl-btn-desc">Base experiment — modular DQN + forced exploration</span>
+        <span class="dl-btn-sub">🔒 .7z · password protected</span>
+      </a>
+      <a class="dl-btn" href="downloads/drl-algo-2.7z" download>
+        <span class="dl-btn-icon">⬇</span>
+        <span class="dl-btn-label">DRL Algorithm #2</span>
+        <span class="dl-btn-desc">Learning rate sweep</span>
+        <span class="dl-btn-sub">🔒 .7z · password protected</span>
+      </a>
+      <a class="dl-btn" href="downloads/drl-algo-3.7z" download>
+        <span class="dl-btn-icon">⬇</span>
+        <span class="dl-btn-label">DRL Algorithm #3</span>
+        <span class="dl-btn-desc">Crazy high dropout rate</span>
+        <span class="dl-btn-sub">🔒 .7z · password protected</span>
+      </a>
+      <a class="dl-btn" href="downloads/drl-algo-4.7z" download>
+        <span class="dl-btn-icon">⬇</span>
+        <span class="dl-btn-label">DRL Algorithm #4</span>
+        <span class="dl-btn-desc">Different ANN sizes</span>
+        <span class="dl-btn-sub">🔒 .7z · password protected</span>
+      </a>
+      <a class="dl-btn" href="downloads/drl-algo-5.7z" download>
+        <span class="dl-btn-icon">⬇</span>
+        <span class="dl-btn-label">DRL Algorithm #5</span>
+        <span class="dl-btn-desc">Capped activation function</span>
+        <span class="dl-btn-sub">🔒 .7z · password protected</span>
+      </a>
+      <a class="dl-btn" href="downloads/drl-algo-6.7z" download>
+        <span class="dl-btn-icon">⬇</span>
+        <span class="dl-btn-label">DRL Algorithm #6</span>
+        <span class="dl-btn-desc">Recurrent (GRU) ANN</span>
+        <span class="dl-btn-sub">🔒 .7z · password protected</span>
+      </a>
+    </div>
+
+    <p class="dl-note">🔒 Each archive is AES-256 encrypted (.7z) — you'll need 7-Zip, Keka, or The Unarchiver, plus the key handed out in class.</p>
+  </section>
+
+  <!-- ================= 6. ROBOTS WELCOME ================= -->
+  <section class="slide" id="section-robots">
+    <h2 class="section-label">06 · Robots Welcome</h2>
+
+    <div class="rob-bg-grid"></div>
+
+    <div class="rob-header">
+      <h1>🤖 Robots Welcome</h1>
+      <span class="rob-panel-tag">ALL BOTS WELCOME</span>
+    </div>
+
+    <div class="rob-stage" id="robStage">
+      <div class="rob-marquee" id="robMarquee">
+        <div class="rob-col"><div class="rob-col-track" id="robCol0"></div></div>
+        <div class="rob-col"><div class="rob-col-track" id="robCol1"></div></div>
+        <div class="rob-col"><div class="rob-col-track" id="robCol2"></div></div>
+      </div>
+      <canvas id="robCrawlCanvas" class="rob-crawl-canvas"></canvas>
+    </div>
+  </section>
+
+</main>
+
+<!-- ================= COOKIE CONSENT GATE ================= -->
+<div class="gate" id="cookieGate">
+  <div class="gate-bg-grid"></div>
+  <div class="gate-hint">★ Hover over the cookie menu to pause &amp; choose!</div>
+  <div class="gate-cookie-banner" id="gateCookieBanner">
+    <div class="gate-title" id="gateBannerTitle">🍪 plz accept our cooowkies 🥺</div>
+    <div class="gate-cookie-btn-group">
+      <button class="gate-btn gate-btn-yes" id="gateYesBtn">Yes 🍪</button>
+      <button class="gate-btn gate-btn-no" id="gateNoBtn">No 😿</button>
+    </div>
+  </div>
+  <canvas id="gateCanvas"></canvas>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="cookie-consent.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
