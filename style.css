@@ -42,6 +42,19 @@ body {
   color: #38bdf8;
   text-transform: uppercase;
   pointer-events: none;
+  /* No width limit here meant long labels (slide 1's especially) could
+     wrap onto a second line on narrow screens, roughly doubling this
+     element's height and colliding with whatever heading each slide
+     places below it -- same shared cause behind slide 1/5/6 all
+     overlapping at once. Force one line and shrink to fit instead. */
+  max-width: calc(100vw - 40px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 980px) {
+  .section-label { font-size: 0.62rem; letter-spacing: 1px; }
 }
 
 /* ================================================================

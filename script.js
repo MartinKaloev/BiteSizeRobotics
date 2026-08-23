@@ -620,12 +620,12 @@ const sectionAnimators = {};
 
   typeCode();
 
-  let ideSeconds = 10;
+  let ideSeconds = 20;
   setInterval(() => {
     ideSeconds--;
     ideTimerEl.textContent = `Retype: ${ideSeconds}s`;
     if (ideSeconds <= 0) {
-      ideSeconds = 10;
+      ideSeconds = 20;
       typeCode();
     }
   }, 1000);
@@ -666,7 +666,7 @@ const sectionAnimators = {};
 
   sectionAnimators['section-ide'] = {
     reset() {
-      ideSeconds = 10;
+      ideSeconds = 20;
       typeCode();
 
       elapsed = 0;
@@ -990,6 +990,30 @@ const sectionAnimators = {};
     mouse.y = e.clientY - rect.top;
   });
 
+  class Packet {
+    constructor(w, h) {
+      this.x = Math.random() * (w - 40) + 20;
+      this.y = Math.random() * (h - 40) + 20;
+      this.size = 10;
+      this.carried = false;
+      this.id = Math.floor(Math.random() * 900 + 100);
+    }
+
+    draw() {
+      if (this.carried) return;
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = '#38bdf8';
+      ctx.fillStyle = '#0284c7';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-this.size / 2, -this.size / 2, this.size, this.size);
+      ctx.fillRect(-this.size / 2 + 1, -this.size / 2 + 1, this.size - 2, this.size - 2);
+      ctx.restore();
+    }
+  }
+
   class Segment {
     constructor(x, y, radius = 8) {
       this.x = x;
@@ -1050,6 +1074,7 @@ const sectionAnimators = {};
     constructor() {
       this.x = Math.random() * width;
       this.y = Math.random() * height;
+      this.home = { x: this.x, y: this.y };
       this.angle = Math.random() * Math.PI * 2;
       this.speed = 0.5 + Math.random() * 0.5;
       this.numSegments = 3;
@@ -1059,11 +1084,60 @@ const sectionAnimators = {};
         this.segments.push(new Segment(this.x - i * this.segmentDist, this.y));
       }
       this.legTimer = 0;
+      this.state = 'WANDER'; // 'WANDER', 'FETCH', 'RETURN' -- same indexer behavior as the background swarm
+      this.target = null;
+      this.carriedPacket = null;
     }
 
-    update() {
+    update(packets) {
       this.legTimer += 0.15;
-      if (Math.random() < 0.02) this.angle += (Math.random() - 0.5) * 1.2;
+
+      if (this.state === 'WANDER') {
+        let nearest = null;
+        let minDst = Infinity;
+        for (const p of packets) {
+          if (!p.carried) {
+            const d = Math.hypot(p.x - this.x, p.y - this.y);
+            if (d < minDst) { minDst = d; nearest = p; }
+          }
+        }
+        if (nearest) {
+          this.target = nearest;
+          this.state = 'FETCH';
+        } else if (Math.random() < 0.02) {
+          this.angle += (Math.random() - 0.5) * 1.2;
+        }
+      } else if (this.state === 'FETCH') {
+        if (!this.target || this.target.carried) {
+          this.state = 'WANDER';
+        } else {
+          const dx = this.target.x - this.x;
+          const dy = this.target.y - this.y;
+          const dist = Math.hypot(dx, dy);
+          this.angle = Math.atan2(dy, dx);
+          if (dist < 10) {
+            this.carriedPacket = this.target;
+            this.carriedPacket.carried = true;
+            this.state = 'RETURN';
+          }
+        }
+      } else if (this.state === 'RETURN') {
+        const dx = this.home.x - this.x;
+        const dy = this.home.y - this.y;
+        const dist = Math.hypot(dx, dy);
+        this.angle = Math.atan2(dy, dx);
+
+        this.carriedPacket.x = this.segments[0].x + Math.cos(this.angle) * 14;
+        this.carriedPacket.y = this.segments[0].y + Math.sin(this.angle) * 14;
+
+        if (dist < 14) {
+          const idx = packets.indexOf(this.carriedPacket);
+          if (idx !== -1) packets.splice(idx, 1);
+          this.carriedPacket = null;
+          this.home = { x: Math.random() * width, y: Math.random() * height };
+          this.state = 'WANDER';
+        }
+      }
 
       this.x += Math.cos(this.angle) * this.speed;
       this.y += Math.sin(this.angle) * this.speed;
@@ -1111,15 +1185,35 @@ const sectionAnimators = {};
       for (let i = this.segments.length - 1; i >= 0; i--) {
         this.segments[i].draw(this.legTimer + i * 1.5, i === 0);
       }
+
+      if (this.carriedPacket) {
+        ctx.save();
+        ctx.translate(this.carriedPacket.x, this.carriedPacket.y);
+        ctx.rotate(this.angle);
+        ctx.fillStyle = '#06b6d4';
+        ctx.strokeStyle = '#67e8f9';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(-5, -5, 10, 10);
+        ctx.fillRect(-4, -4, 8, 8);
+        ctx.restore();
+      }
     }
   }
+
+  const packets = [];
+  for (let i = 0; i < 4; i++) packets.push(new Packet(width, height));
+
+  setInterval(() => {
+    if (packets.length < 5) packets.push(new Packet(width, height));
+  }, 3500);
 
   const bots = [];
   for (let i = 0; i < 7; i++) bots.push(new WanderBot());
 
   function animate() {
     ctx.clearRect(0, 0, width, height);
-    bots.forEach(b => { b.update(); b.draw(); });
+    packets.forEach(p => p.draw());
+    bots.forEach(b => { b.update(packets); b.draw(); });
     requestAnimationFrame(animate);
   }
   animate();
@@ -1132,10 +1226,33 @@ const sectionAnimators = {};
   const rungs = Array.from(document.querySelectorAll('.navrung'));
   const sections = rungs.map(rung => document.getElementById(rung.dataset.target));
   const flash = document.getElementById('navFlash');
+  const htmlEl = document.documentElement;
+
+  // CSS scroll-snap can fight a JS-driven smooth scroll mid-animation
+  // (the snap correction and the scroll target end up disagreeing about
+  // where to land), which is what made clicks need a second try. Turning
+  // snap off for the duration of the animated scroll, then back on once
+  // it actually finishes, lets the scroll complete cleanly every time.
+  let snapRestoreTimer = null;
+  function jumpToSection(section) {
+    htmlEl.style.scrollSnapType = 'none';
+    section.scrollIntoView({ behavior: 'smooth' });
+
+    clearTimeout(snapRestoreTimer);
+    const restoreSnap = () => {
+      htmlEl.style.scrollSnapType = '';
+      htmlEl.removeEventListener('scrollend', restoreSnap);
+    };
+    if ('onscrollend' in window) {
+      htmlEl.addEventListener('scrollend', restoreSnap, { once: true });
+    } else {
+      snapRestoreTimer = setTimeout(restoreSnap, 900);
+    }
+  }
 
   rungs.forEach((rung, i) => {
     rung.addEventListener('click', () => {
-      sections[i].scrollIntoView({ behavior: 'smooth' });
+      jumpToSection(sections[i]);
     });
   });
 
@@ -1161,20 +1278,23 @@ const sectionAnimators = {};
   let flashIndex = 0;
   let shownIndex = 0; // which section the flash label currently names, for click-to-jump
   const CYCLE_MS = 3500;
-  const SHOW_MS = 2200;
+
+  let prevFlashingRung = null;
 
   function runFlashCycle() {
     const rung = rungs[flashIndex];
     shownIndex = flashIndex;
     flash.textContent = rung.dataset.label;
     flash.style.top = rung.style.top || `${(flashIndex / (rungs.length - 1)) * 100}%`;
+    // Stays visible (and clickable) permanently now -- it used to fully
+    // hide for ~1.3s of every 3.5s cycle, during which clicking it did
+    // nothing at all. It just relabels/repositions itself in place now,
+    // so there's no dead window where the hint is sitting there inert.
     flash.classList.add('visible');
-    rung.classList.add('flashing');
 
-    setTimeout(() => {
-      flash.classList.remove('visible');
-      rung.classList.remove('flashing');
-    }, SHOW_MS);
+    if (prevFlashingRung) prevFlashingRung.classList.remove('flashing');
+    rung.classList.add('flashing');
+    prevFlashingRung = rung;
 
     flashIndex = (flashIndex + 1) % rungs.length;
   }
@@ -1182,7 +1302,7 @@ const sectionAnimators = {};
   // Clicking the flash label itself jumps to whichever section it's
   // currently naming, same as clicking its rung would.
   flash.addEventListener('click', () => {
-    sections[shownIndex].scrollIntoView({ behavior: 'smooth' });
+    jumpToSection(sections[shownIndex]);
   });
 
   // Rungs are laid out with nth-of-type top percentages in CSS; mirror that here.
