@@ -506,6 +506,10 @@ body {
   height: 100%;
   position: relative;
   z-index: 10;
+  /* border-box (global) keeps this inside the 100% height instead of
+     pushing the total taller -- clears the "02 · ..." label fixed at
+     top:22px, which the IDE header used to sit right on top of. */
+  padding-top: 46px;
 }
 
 .ide-half {
@@ -1146,7 +1150,15 @@ body {
 
 @media (max-width: 700px) {
   .dl-grid { grid-template-columns: repeat(2, minmax(130px, 170px)); gap: 14px; }
-  .dl-header h1 { font-size: 1.3rem; }
+  /* All text here 20% smaller than before (the blue "05 · ..." label is
+     its own shared .section-label component, sized separately -- left
+     alone here as asked). */
+  .dl-header h1 { font-size: 1.04rem; }
+  .dl-header p { font-size: 0.72rem; }
+  .dl-btn-label { font-size: 0.74rem; }
+  .dl-btn-desc { font-size: 0.59rem; }
+  .dl-btn-sub { font-size: 0.58rem; }
+  .dl-note { font-size: 0.64rem; }
 }
 
 @media (max-height: 760px) {
@@ -1277,7 +1289,7 @@ body {
 }
 
 @media (max-height: 760px) {
-  .rob-header { top: 26px; }
+  .rob-header { top: 36px; }
   .rob-stage { top: 68px; }
   /* Most phones are narrow AND under 760px tall, so this rule (later in
      the cascade) would otherwise win over the max-width block above and
