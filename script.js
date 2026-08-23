@@ -352,6 +352,17 @@ const sectionAnimators = {};
     }
   }, 100);
 
+  // Click the clock face to skip straight to the wheel instead of waiting
+  // out the full 10s auto-flip.
+  const clockFace = document.querySelector('.clock-clock-side');
+  clockFace.addEventListener('click', () => {
+    if (isFlipped || isSpinning) return;
+    elapsed = 0;
+    isFlipped = true;
+    flipper.classList.add('flipped');
+    swapBar.style.width = '0%';
+  });
+
   sectionAnimators['section-clock'] = {
     reset() {
       elapsed = 0;
@@ -527,27 +538,21 @@ const sectionAnimators = {};
   let currentFile = 0;
   const typedCodeEl = document.getElementById('ideTypedCode');
   const lineNumbersEl = document.getElementById('ideLineNumbers');
+  const ideBodyEl = document.getElementById('ideBody');
   const ideTimerEl = document.getElementById('ideTimer');
   const ideFileTabEl = document.getElementById('ideFileTab');
 
-  function parseHtmlTokens(html) {
-    const tokens = [];
-    let i = 0;
-    while (i < html.length) {
-      if (html[i] === '<') {
-        const closeIdx = html.indexOf('>', i);
-        tokens.push(html.slice(i, closeIdx + 1));
-        i = closeIdx + 1;
-      } else if (html[i] === '&') {
-        const closeIdx = html.indexOf(';', i);
-        tokens.push(html.slice(i, closeIdx + 1));
-        i = closeIdx + 1;
-      } else {
-        tokens.push(html[i]);
-        i++;
-      }
-    }
-    return tokens;
+  // Parse the syntax-highlighted source into flat segments (one per plain
+  // text run or colored <span>) using the browser's own HTML parser, so
+  // entities etc. are handled correctly. This runs once per file, on the
+  // complete well-formed string -- never on a half-typed one.
+  function parseSegments(html) {
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    return Array.from(container.childNodes).map(node => ({
+      className: node.nodeType === Node.ELEMENT_NODE ? node.className : null,
+      fullText: node.textContent
+    }));
   }
 
   let typingInterval = null;
@@ -556,27 +561,58 @@ const sectionAnimators = {};
     clearInterval(typingInterval);
     typedCodeEl.innerHTML = '';
     lineNumbersEl.innerHTML = '1';
+    ideBodyEl.scrollTop = 0;
 
     const file = codeFiles[currentFile];
     ideFileTabEl.textContent = file.name;
 
-    const tokens = parseHtmlTokens(file.code);
-    let tokenIndex = 0;
-    let currentLine = 1;
+    const segments = parseSegments(file.code);
+
+    // Build the real DOM nodes up front (each colored span already has its
+    // class, just empty) -- then the animation only ever grows a node's
+    // textContent, which never gets re-parsed as HTML and so can't get
+    // auto-closed mid-word the way the old innerHTML-concatenation did.
+    const liveNodes = segments.map(seg => {
+      if (seg.className) {
+        const span = document.createElement('span');
+        span.className = seg.className;
+        typedCodeEl.appendChild(span);
+        return span;
+      }
+      const textNode = document.createTextNode('');
+      typedCodeEl.appendChild(textNode);
+      return textNode;
+    });
+
+    let segIndex = 0;
+    let charIndex = 0;
 
     typingInterval = setInterval(() => {
-      if (tokenIndex < tokens.length) {
-        const token = tokens[tokenIndex];
-        typedCodeEl.innerHTML += token;
-
-        if (token === '\n') {
-          currentLine++;
-          lineNumbersEl.innerHTML = Array.from({ length: currentLine }, (_, i) => i + 1).join('<br>');
-        }
-        tokenIndex++;
-      } else {
+      if (segIndex >= segments.length) {
         clearInterval(typingInterval);
+        return;
       }
+
+      charIndex++;
+      const seg = segments[segIndex];
+      liveNodes[segIndex].textContent = seg.fullText.slice(0, charIndex);
+
+      if (charIndex >= seg.fullText.length) {
+        segIndex++;
+        charIndex = 0;
+      }
+
+      let revealedText = '';
+      for (let i = 0; i <= Math.min(segIndex, segments.length - 1); i++) {
+        revealedText += liveNodes[i].textContent;
+      }
+      const lineCount = (revealedText.match(/\n/g) || []).length + 1;
+      lineNumbersEl.innerHTML = Array.from({ length: lineCount }, (_, i) => i + 1).join('<br>');
+
+      // Auto-slide the code box to follow the newest typed line instead of
+      // letting the box grow to fit -- matters most on mobile, where the
+      // IDE panel has a fixed height and no room to expand.
+      ideBodyEl.scrollTop = ideBodyEl.scrollHeight;
     }, 22);
 
     currentFile = (currentFile + 1) % codeFiles.length;
