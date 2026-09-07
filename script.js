@@ -993,6 +993,35 @@ const sectionAnimators = {};
     }
   }
 
+  // The King's own packet: unlike every other packet on the site, this
+  // one is never carried anywhere -- it just gets eaten in place, then
+  // reappears somewhere new for the King to go hunt down again.
+  class KingPacket {
+    constructor(w, h) {
+      this.respawn(w, h);
+    }
+    respawn(w, h) {
+      this.x = 20 + Math.random() * Math.max(1, w - 40);
+      this.y = 20 + Math.random() * Math.max(1, h - 40);
+      this.age = 0;
+    }
+    draw() {
+      this.age++;
+      const scale = Math.min(1, this.age / 12); // quick pop-in when it reappears
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.scale(scale, scale);
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = '#38bdf8';
+      ctx.fillStyle = '#0284c7';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-6, -6, 12, 12);
+      ctx.fillRect(-5, -5, 10, 10);
+      ctx.restore();
+    }
+  }
+
   class KingBot {
     constructor(count) {
       this.x = 0;
@@ -1003,6 +1032,7 @@ const sectionAnimators = {};
       this.segments = [];
       this.legTimer = 0;
       this._placed = false;
+      this.packet = null; // set right after construction, once width/height are known
       this.setSegmentCount(count);
     }
 
@@ -1032,7 +1062,20 @@ const sectionAnimators = {};
     update() {
       if (!this._placed && width) this.place();
       this.legTimer += 0.12;
-      if (Math.random() < 0.015) this.angle += (Math.random() - 0.5) * 1.0;
+
+      if (this.packet) {
+        // Always hunting: steer straight at the current packet, and when
+        // the head reaches it, it's eaten -- gone, then reappears
+        // somewhere new for the King to go find next.
+        const dx = this.packet.x - this.x;
+        const dy = this.packet.y - this.y;
+        this.angle = Math.atan2(dy, dx);
+        if (Math.hypot(dx, dy) < 14) {
+          this.packet.respawn(width, height);
+        }
+      } else if (Math.random() < 0.015) {
+        this.angle += (Math.random() - 0.5) * 1.0;
+      }
 
       this.x += Math.cos(this.angle) * this.speed;
       this.y += Math.sin(this.angle) * this.speed;
@@ -1075,28 +1118,12 @@ const sectionAnimators = {};
   }
 
   const king = new KingBot(kingSegmentCount);
-
-  // Unlike every other packet on the site, this one is never fetched,
-  // carried, or removed -- it just permanently sits with the King.
-  function drawPermanentPacket() {
-    const px = width * 0.5;
-    const py = height * 0.85;
-    ctx.save();
-    ctx.translate(px, py);
-    ctx.shadowBlur = 6;
-    ctx.shadowColor = '#38bdf8';
-    ctx.fillStyle = '#0284c7';
-    ctx.strokeStyle = '#38bdf8';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-6, -6, 12, 12);
-    ctx.fillRect(-5, -5, 10, 10);
-    ctx.restore();
-  }
+  king.packet = new KingPacket(width, height);
 
   function animateStage() {
     if (width && height) {
       ctx.clearRect(0, 0, width, height);
-      drawPermanentPacket();
+      king.packet.draw();
       king.update();
       king.draw();
     }
@@ -1111,6 +1138,23 @@ const sectionAnimators = {};
   updateSegmentLabel();
 
   // ---------------- Quiz ----------------
+  // trivia.json wraps LaTeX spans in \( ... \) -- escape first so any stray
+  // HTML-special char in the source text can't be read as a tag, then hand
+  // the container to KaTeX's auto-render, which finds those \( \) spans in
+  // the freshly-inserted DOM text and swaps them for real typeset formulas.
+  function escapeHtml(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function renderMath(container) {
+    if (typeof renderMathInElement === 'function') {
+      renderMathInElement(container, {
+        delimiters: [{ left: '\\(', right: '\\)', display: false }],
+        throwOnError: false
+      });
+    }
+  }
+
   function renderQuestion() {
     if (!questions.length) return;
     answering = false;
@@ -1119,13 +1163,15 @@ const sectionAnimators = {};
 
     const q = questions[questionIndex];
     progressEl.textContent = `Question ${questionIndex + 1} of ${questions.length}`;
-    questionEl.textContent = q.q;
+    questionEl.innerHTML = escapeHtml(q.q);
+    renderMath(questionEl);
 
     answersEl.innerHTML = '';
     q.options.forEach((opt, i) => {
       const btn = document.createElement('button');
       btn.className = 'game-answer-btn';
-      btn.textContent = opt;
+      btn.innerHTML = escapeHtml(opt);
+      renderMath(btn);
       btn.addEventListener('click', () => handleAnswer(i, btn));
       answersEl.appendChild(btn);
     });

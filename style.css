@@ -1259,6 +1259,14 @@ body {
   font-family: 'Fira Code', 'Courier New', Courier, monospace;
 }
 
+/* Trivia text carries \( ... \) spans that KaTeX swaps for real formulas
+   (see indexMasterGame() in script.js). Long ones (e.g. the PAC-Bayes
+   bound) can be wider than the panel, so let them scroll sideways rather
+   than blow out the button/box layout; keep the size matched to the
+   surrounding monospace text instead of KaTeX's own larger default. */
+.game-question .katex, .game-answer-btn .katex { font-size: 1em; }
+.game-question, .game-answer-btn { overflow-x: auto; }
+
 .game-answers {
   display: flex;
   flex-direction: column;
