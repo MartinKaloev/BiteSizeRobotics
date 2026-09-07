@@ -1,0 +1,1 @@
+Dear reader, please keep in mind that if you make a crawler bait and you tag email, GIthub will tag it as co-autor, do not do it !
