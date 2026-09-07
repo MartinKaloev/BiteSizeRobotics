@@ -1,0 +1,252 @@
+[
+  {
+    "q": "What is an Artificial Neural Network (ANN)?",
+    "options": [
+      "A relational database system optimized for graph queries.",
+      "A computational model inspired by biological nervous systems, consisting of interconnected layers of nodes that process data.",
+      "A deterministic search algorithm that traverses binary trees using depth-first search.",
+      "A hardware processor designed exclusively for quantum parallel computing."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "What is the core objective of the Q-learning algorithm in Reinforcement Learning?",
+    "options": [
+      "To cluster unlabelled continuous state vectors using Euclidean distance.",
+      "To compute the maximum likelihood of transition probabilities in a partially observable environment.",
+      "To learn an optimal action-value function that estimates the expected total future reward for taking an action in a given state.",
+      "To eliminate all exploration and strictly follow a predefined heuristic policy."
+    ],
+    "correct": 2
+  },
+  {
+    "q": "What is the primary role of an Activation Function in a neural network?",
+    "options": [
+      "To introduce non-linearity into the network, enabling it to learn complex non-linear mappings.",
+      "To speed up gradient descent by setting the learning rate to zero when error is high.",
+      "To automatically split training data into cross-validation folds.",
+      "To convert discrete text tokens into continuous floating-point vectors."
+    ],
+    "correct": 0
+  },
+  {
+    "q": "In an artificial neuron (Perceptron), what is the mathematical operation performed on the inputs (x_1, x_2, \\dots, x_n) with weights (w_1, w_2, \\dots, w_n) and bias b before applying the activation function?",
+    "options": [
+      "\\prod_{i=1}^{n} (w_i x_i) + b",
+      "\\sum_{i=1}^{n} (w_i + x_i) - b",
+      "\\sum_{i=1}^{n} (w_i x_i) + b",
+      "\\max(w_1 x_1, \\dots, w_n x_n) + b"
+    ],
+    "correct": 2
+  },
+  {
+    "q": "What does overfitting mean in machine learning?",
+    "options": [
+      "The model performs exceptionally well on the training data but fails to generalize to unseen test data.",
+      "The model is too simple to capture the underlying trend in both training and test data.",
+      "The model takes too long to converge due to an excessively small learning rate.",
+      "The loss function reaches a local saddle point where all gradients evaluate to zero. Part 2: Advanced & Expert Level (Questions 6–25)"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "In natural gradient descent, parameter updates are performed along the steepest descent direction invariant to reparameterization. Which matrix is used to define the Riemannian metric manifold for this optimization?",
+    "options": [
+      "The Hessian matrix of the empirical risk \\nabla^2 \\mathcal{L}(\\theta).",
+      "The Fisher Information Matrix F = \\mathbb{E}_{p_\\theta(x,y)}\\left[\\nabla_\\theta \\log p_\\theta(x,y) \\nabla_\\theta \\log p_\\theta(x,y)^T\\right].",
+      "The uncentered covariance matrix of input activations across all layers.",
+      "The Gram matrix of the feature vectors computed in reproducing kernel Hilbert space (RKHS)."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Why does AdamW decouple weight decay from the gradient update step, unlike traditional L_2 regularization in standard Adam?",
+    "options": [
+      "Because L_2 regularization in Adam causes the second moment estimate v_t to scale proportionally with weight decay gradients, inadvertently penalizing weights with historically large gradients less than weights with small gradients.",
+      "Because L_2 regularization introduces non-differentiable points at the origin that break momentum accumulation.",
+      "Because standard Adam computes weight updates exclusively in fp16 precision where gradient addition underflows.",
+      "Because decoupled decay guarantees that the spectral norm of the weight matrices remains strictly bounded by \\le 1."
+    ],
+    "correct": 0
+  },
+  {
+    "q": "In the FlashAttention algorithm (Dao et al.), how is exact standard self-attention computed with significantly reduced wall-clock time and memory footprint?",
+    "options": [
+      "By projecting Q and K into low-rank representations using random Fourier features.",
+      "By tiling inputs into SRAM blocks and computing the softmax incrementally using online softmax normalization, avoiding reading/writing the N \\times N attention matrix to High Bandwidth Memory (HBM).",
+      "By quantizing intermediate attention weights to 4-bit integers and pruning attention heads with low entropy.",
+      "By swapping outer-product matrix multiplications with fast Walsh-Hadamard transforms in the frequency domain."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In Direct Preference Optimization (DPO), how is the explicit reward model r_\\psi(x, y) from RLHF bypassed during policy optimization?",
+    "options": [
+      "By training an actor-critic network where the critic updates solely on self-supervised masked tokens.",
+      "By analytically reparameterizing the ground-truth reward function as a closed-form function of the policy \\pi_\\theta(y|x) and reference policy \\pi_{\\text{ref}}(y|x), substituting it directly into the Bradley-Terry preference loss.",
+      "By replacing cross-entropy loss with an optimal transport Earth Mover's Distance between chosen and rejected sequences.",
+      "By running Monte Carlo Tree Search (MCTS) over the vocabulary during token generation to prune non-preferred trajectories."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In Denoising Diffusion Probabilistic Models (DDPM), what is the theoretical relationship between the score function \\nabla_{x_t} \\log q(x_t) and the noise prediction network \\epsilon_\\theta(x_t, t)?",
+    "options": [
+      "\\nabla_{x_t} \\log q_t(x_t) = -\\frac{\\epsilon_\\theta(x_t, t)}{\\sqrt{1 - \\bar{\\alpha}_t}}",
+      "\\nabla_{x_t} \\log q_t(x_t) = \\frac{\\epsilon_\\theta(x_t, t)}{\\sqrt{\\bar{\\alpha}_t}}",
+      "\\nabla_{x_t} \\log q_t(x_t) = -\\epsilon_\\theta(x_t, t) \\cdot \\beta_t^2",
+      "\\nabla_{x_t} \\log q_t(x_t) = \\left( \\epsilon_\\theta(x_t, t) \\right)^T \\left( x_t - \\mu_t \\right)"
+    ],
+    "correct": 0
+  },
+  {
+    "q": "In Statistical Learning Theory, what does the Vapnik-Chervonenkis (VC) Dimension of a hypothesis class \\mathcal{H} measure?",
+    "options": [
+      "The maximum number of training samples a model can store in active memory without paging to disk.",
+      "The size of the largest finite set of points that can be shattered by \\mathcal{H} (i.e., assigned all possible 2^N binary label combinations).",
+      "The expected L_1 Lipschitz constant of the loss landscape with respect to parameter perturbation.",
+      "The exact minimum number of epochs required for empirical risk minimization to achieve zero generalization error."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In the infinite-width limit under specific initialization scaling, what happens to an artificial neural network according to the Neural Tangent Kernel (NTK) theory?",
+    "options": [
+      "The network degenerates into a linear logistic regression model with zero capacity.",
+      "The empirical NTK stays constant throughout gradient flow training, making network training analytically equivalent to kernel regression with a fixed deterministic kernel.",
+      "The Fisher Information Matrix becomes singular, halting all gradient propagation regardless of depth.",
+      "The activations collapse into a deterministic chaos regime characterized by positive Lyapunov exponents."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "What is the theoretical upper limit on the expressive power of standard Message Passing Graph Neural Networks (MPNNs) in distinguishing non-isomorphic graphs?",
+    "options": [
+      "They can distinguish any pair of non-isomorphic planar graphs with probability 1.",
+      "They are at most as powerful as the 1-dimensional Weisfeiler-Lehman (1-WL) graph isomorphism test.",
+      "They are strictly equivalent to the 3-WL test if sum-aggregation is used.",
+      "Their expressive capacity is bounded only by the rank of the adjacency matrix Laplacian spectrum."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In Rotary Position Embedding (RoPE), how is relative position information injected into the Query (q) and Key (k) vector inner product?",
+    "options": [
+      "By adding a learned position embedding tensor directly to the attention logit matrix: A_{ij} = q_i^T k_j + b_{i-j}.",
+      "By rotating 2D slices of the vectors in the complex plane such that \\langle R_{\\Theta, m}^d q, R_{\\Theta, n}^d k \\rangle = g(q, k, m - n), making the inner product dependent solely on relative distance (m - n).",
+      "By projecting input embeddings through a continuous sinusoidal Fourier shift operator prior to multi-head projection.",
+      "By masking the attention matrix with a static Cauchy matrix parameterizing token indices."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In the InfoNCE loss used in contrastive representation learning (\\mathcal{L}_{\\text{InfoNCE}} = -\\mathbb{E}\\left[\\log \\frac{\\exp(s(x, x^+)/\\tau)}{\\exp(s(x, x^+)/\\tau) + \\sum_{j} \\exp(s(x, x^-_j)/\\tau)}\\right]), minimizing this loss is mathematically equivalent to maximizing:",
+    "options": [
+      "A lower bound on the Mutual Information I(X; Y) between positive views.",
+      "The Rényi divergence between negative sampling distributions.",
+      "The Wasserstein-1 distance across distinct batch instances.",
+      "An upper bound on the cross-entropy of latent cluster assignments."
+    ],
+    "correct": 0
+  },
+  {
+    "q": "In Generalized Advantage Estimation (GAE), what is the effect of tuning the hyperparameter \\lambda \\in [0, 1] in \\text{GAE}(\\gamma, \\lambda)?",
+    "options": [
+      "\\lambda = 0 yields maximum variance and zero bias (pure Monte Carlo return); \\lambda = 1 yields lowest variance and highest bias.",
+      "\\lambda = 0 corresponds to the standard 1-step TD advantage (lowest variance, highest bias); \\lambda = 1 corresponds to the empirical Monte Carlo advantage (highest variance, lowest bias).",
+      "\\lambda controls the entropy regularization penalty added to the policy objective.",
+      "\\lambda scales the clipping threshold in the surrogate PPO objective function."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In the Double Descent phenomenon observed in deep learning models, what happens to the test risk around the interpolation threshold (where model capacity matches sample size)?",
+    "options": [
+      "The test risk drops asymptotically to zero.",
+      "The test risk peaks sharply because the empirical data covariance matrix is poorly conditioned, leading to exploding norm of the minimum-norm interpolating parameters.",
+      "The model transitions instantly into the underfitting regime where training error diverges.",
+      "The Hessian becomes positive definite, preventing SGD from traversing saddle points."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In Low-Rank Adaptation (LoRA), why is the weight update parameterized as \\Delta W = B \\cdot A (where W_0 \\in \\mathbb{R}^{d \\times k}, B \\in \\mathbb{R}^{d \\times r}, A \\in \\mathbb{R}^{r \\times k} with r \\ll \\min(d, k)), and how are A and B initialized?",
+    "options": [
+      "A and B are both initialized from a Gaussian distribution \\mathcal{N}(0, 1) to promote exploration of rank space.",
+      "A is initialized from Gaussian distribution \\mathcal{N}(0, \\sigma^2) and B is initialized to zero, ensuring \\Delta W = 0 at the start of training.",
+      "Both A and B are initialized as identity matrices to preserve pre-trained feature mappings.",
+      "B is initialized as an orthogonal matrix via QR decomposition and A is set to zero."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In Variational Autoencoders (VAEs), what is the \"posterior collapse\" phenomenon and what causes it?",
+    "options": [
+      "The encoder collapses all latent variables to \\infty, causing floating point overflows in the decoder.",
+      "The approximate posterior q_\\phi(z|x) matches the prior p(z) completely, causing the decoder to ignore the latent code z because the autoregressive decoder is expressive enough on its own.",
+      "The variance of the decoder's Gaussian likelihood collapses to 0, turning ELBO into an ill-posed deterministic reconstruction.",
+      "The gradient of the KL-divergence term dominates the reconstruction loss, forcing weights to undergo numerical underflow."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In state space models like Mamba (S6), how does the Selective State Space mechanism overcome the fundamental linear time-invariant (LTI) restriction of predecessor models like S4?",
+    "options": [
+      "By replacing ODE solvers with an attention matrix computation over chunked sub-sequences.",
+      "By making the discretization step size \\Delta and transition parameters (B, C) input-dependent functions of the current token x_t, processed in linear time via a hardware-aware parallel associative scan.",
+      "By substituting the continuous convolution operation with an auto-regressive multi-layer perceptron.",
+      "By dynamically masking the state matrix A to retain only top-k eigenvalues."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "Why does RMSNorm (Root Mean Square Normalization) replace standard Layer Normalization in architectures like LLaMA and Mistral?",
+    "options": [
+      "RMSNorm enforces exact unit mean and zero variance, completely eliminating shift bias.",
+      "RMSNorm drops the mean-centering operation, calculating scaling exclusively based on root mean square of activations, which reduces computational overhead without degrading downstream performance.",
+      "RMSNorm operates across the sequence dimension instead of the hidden channel dimension, speeding up GEMM operations.",
+      "RMSNorm guarantees the Jacobian of the residual stream has singular values strictly equal to 1."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In the context of generative diffusion models, what is the key difference between using Deterministic DDIM (Denoising Diffusion Implicit Models) and Stochastic DDPM during sampling?",
+    "options": [
+      "DDIM reformulates the generative process as the discretization of an equivalent continuous ordinary differential equation (ODE), allowing deterministic sampling in significantly fewer steps with fixed initial noise.",
+      "DDIM discards the reverse noise schedule and evaluates the model exclusively in the frequency domain.",
+      "DDIM requires fine-tuning the model using a classification-guided policy gradient rather than standard MSE.",
+      "DDIM trains a secondary discriminator network to replace iterative reverse Langevin dynamics."
+    ],
+    "correct": 0
+  },
+  {
+    "q": "In Mixture of Experts (MoE) routing (e.g., in Mixtral / Switch Transformer), why is an auxiliary load-balancing loss added to the training objective?",
+    "options": [
+      "To force the router logits to sum to exactly 1 without running a softmax.",
+      "To prevent \"router collapse\" where the gating network repeatedly selects the same small subset of preferred experts, leaving the remaining experts untrained and starved of gradients.",
+      "To penalize experts whose weight tensors have large spectral radii.",
+      "To synchronize the gradients of parallel GPUs during all-to-all communication primitives."
+    ],
+    "correct": 1
+  },
+  {
+    "q": "In Continuous Normalizing Flows and Flow Matching, what is the primary advantage of training models with Optimal Transport (OT) displacement interpolation over standard diffusion trajectories?",
+    "options": [
+      "OT paths define straight-line probability trajectories in state space with constant vector fields, leading to faster ODE integration during inference with fewer function evaluations (NFE).",
+      "OT guarantees that the generative density is strictly multimodal without requiring score matching.",
+      "OT eliminates the need for computing the trace of the Jacobian matrix during likelihood computation.",
+      "OT allows arbitrary non-differentiable target distributions to be mapped into the latent prior."
+    ],
+    "correct": 0
+  },
+  {
+    "q": "Consider a distribution-free supervised learning setup with bounded loss. According to the PAC-Bayes Theorem (McAllester's bound), with probability at least 1 - \\delta over the draw of training set S of size m, for any posterior distribution Q over the hypothesis space: What quantity upper-bounds the true generalization risk \\mathcal{R}(Q) relative to empirical risk \\hat{\\mathcal{R}}_S(Q)?",
+    "options": [
+      "\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\sqrt{\\frac{\\text{KL}(Q \\parallel P) + \\ln(2\\sqrt{m}/\\delta)}{2m}} (where P is the prior chosen independently of S).",
+      "\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\frac{\\text{VC-Dim}(\\mathcal{H})}{m} \\ln\\left(\\frac{m}{\\delta}\\right).",
+      "\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\frac{1}{\\sqrt{m}} \\sum_{i=1}^m \\mathbb{E}_{\\sigma}[\\sigma_i f(x_i)].",
+      "\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\left( \\frac{\\text{Tr}(F^{-1})}{m} \\right) \\ln\\left(\\frac{1}{\\delta}\\right)."
+    ],
+    "correct": 0
+  }
+]

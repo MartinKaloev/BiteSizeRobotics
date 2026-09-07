@@ -1167,7 +1167,160 @@ body {
 }
 
 /* ================================================================
-   6. ROBOTS WELCOME
+   6. INDEX MASTER (TRIVIA GAME)
+   ================================================================ */
+.game-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+.game-split-layout {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 10;
+  /* Clears the "06 · Index Master" label fixed at top:22px -- same fix
+     as slide 2's IDE panel needed. */
+  padding-top: 46px;
+}
+
+.game-stage-half {
+  flex: 1;
+  background: #0d1117;
+  border-right: 2px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.game-stage-header {
+  background: #161b22;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid #30363d;
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: #facc15;
+}
+.game-segment-count { color: #94a3b8; }
+
+.game-stage {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+.game-stage canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.game-stage-note {
+  flex-shrink: 0;
+  padding: 10px 16px;
+  font-size: 0.78rem;
+  color: #64748b;
+  font-family: monospace;
+  border-top: 1px solid #1e293b;
+}
+
+.game-quiz-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  gap: 14px;
+}
+
+.game-quiz-progress {
+  font-family: monospace;
+  font-size: 0.78rem;
+  color: #38bdf8;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.game-question {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  line-height: 1.5;
+  font-family: 'Fira Code', 'Courier New', Courier, monospace;
+}
+
+.game-answers {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.game-answer-btn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: #161f30;
+  border: 1.5px solid #1e293b;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color: #e2e8f0;
+  font-family: 'Fira Code', 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.game-answer-btn:hover:not(:disabled) {
+  border-color: #38bdf8;
+  background: #1e293b;
+}
+.game-answer-btn:disabled { cursor: default; }
+.game-answer-btn.correct {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+}
+.game-answer-btn.wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.game-feedback {
+  min-height: 1.4em;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.game-feedback.correct { color: #4ade80; }
+.game-feedback.wrong { color: #f87171; }
+
+@media (max-width: 860px) {
+  /* #section-game deliberately keeps the normal 100vh from the base
+     .slide rule (no height:auto/min-height override) -- that pattern is
+     exactly what let slide 2's IDE panel exceed one screen the first
+     time. Both panes below are bounded to fit within it instead. */
+  .game-split-layout { flex-direction: column; padding-top: 39px; }
+  /* flex:none is required here, not optional -- flex:1 on .game-stage-half
+     (above) sets flex-basis:0%, which makes flexbox ignore a plain height
+     entirely. Learned the hard way on slides 2 and 4. */
+  .game-stage-half { flex: none; height: 40vh; }
+  .game-quiz-half { flex: 1; min-height: 0; padding: 16px; overflow-y: auto; }
+  .game-question { font-size: 0.92rem; }
+  .game-answer-btn { font-size: 0.76rem; padding: 10px 12px; }
+}
+
+/* ================================================================
+   7. ROBOTS WELCOME
    ================================================================ */
 .rob-bg-grid {
   position: absolute;

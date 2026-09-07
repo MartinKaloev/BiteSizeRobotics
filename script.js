@@ -892,7 +892,292 @@ const sectionAnimators = {};
 })();
 
 /* ================================================================
-   5. ROBOTS WELCOME (crawlers wander over the 3-column bot marquee)
+   5. INDEX MASTER (trivia game -- King Indexer grows on correct answers)
+   ================================================================ */
+(function indexMasterGame() {
+  const canvas = document.getElementById('kingBotCanvas');
+  const stage = document.getElementById('gameStage');
+  if (!canvas || !stage) return;
+  const ctx = canvas.getContext('2d');
+
+  const questionEl = document.getElementById('gameQuestion');
+  const answersEl = document.getElementById('gameAnswers');
+  const progressEl = document.getElementById('gameProgress');
+  const feedbackEl = document.getElementById('gameFeedback');
+  const segmentCountEl = document.getElementById('gameSegmentCount');
+
+  const STORAGE_Q = 'im_question_index';
+  const STORAGE_SEG = 'im_king_segments';
+  const MIN_SEG = 3;
+  const MAX_SEG = 28;
+
+  let questions = [];
+  let questionIndex = parseInt(localStorage.getItem(STORAGE_Q), 10) || 0;
+  let kingSegmentCount = parseInt(localStorage.getItem(STORAGE_SEG), 10) || MIN_SEG;
+  let answering = false;
+
+  let width, height;
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    width = canvas.width = rect.width;
+    height = canvas.height = rect.height;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Same dome-body-plus-legs look used by every other bot on the site,
+  // just gold instead of blue, with a small crown added on the head.
+  class KingSegment {
+    constructor(x, y, radius = 9) {
+      this.x = x;
+      this.y = y;
+      this.angle = 0;
+      this.radius = radius;
+      this.squishX = 1;
+      this.squishY = 1;
+    }
+
+    draw(legPhase, isHead) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+      ctx.scale(this.squishX, this.squishY);
+
+      const legL = Math.sin(legPhase) * 5;
+      const legR = Math.cos(legPhase) * 5;
+
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = 1.4;
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(0, -this.radius * 0.7);
+      ctx.lineTo(-this.radius * 1.6, -this.radius * 1.8 + legL);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, this.radius * 0.7);
+      ctx.lineTo(-this.radius * 1.6, this.radius * 1.8 + legR);
+      ctx.stroke();
+
+      ctx.shadowBlur = 6;
+      ctx.shadowColor = '#ca8a04';
+      ctx.fillStyle = '#1c1305';
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 1.4;
+
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius, -Math.PI / 2, Math.PI / 2, false);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      if (isHead) {
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.moveTo(-4, -this.radius * 0.9);
+        ctx.lineTo(-4, -this.radius * 1.6);
+        ctx.lineTo(0, -this.radius * 1.1);
+        ctx.lineTo(4, -this.radius * 1.6);
+        ctx.lineTo(4, -this.radius * 0.9);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#fde047';
+        ctx.beginPath();
+        ctx.arc(this.radius * 0.45, 0, 1.8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+  }
+
+  class KingBot {
+    constructor(count) {
+      this.x = 0;
+      this.y = 0;
+      this.angle = Math.random() * Math.PI * 2;
+      this.speed = 0.35;
+      this.segmentDist = 11;
+      this.segments = [];
+      this.legTimer = 0;
+      this._placed = false;
+      this.setSegmentCount(count);
+    }
+
+    place() {
+      this.x = width / 2;
+      this.y = height / 2;
+      this.segments.forEach((s, i) => {
+        s.x = this.x - i * this.segmentDist;
+        s.y = this.y;
+      });
+      this._placed = true;
+    }
+
+    // Grows (or, in principle, shrinks) toward n segments by adding new
+    // ones at the tail's current position -- they get pulled into the
+    // follow-chain naturally over the next few frames instead of
+    // popping in somewhere jarring.
+    setSegmentCount(n) {
+      n = Math.max(MIN_SEG, Math.min(MAX_SEG, n));
+      while (this.segments.length < n) {
+        const tail = this.segments[this.segments.length - 1];
+        this.segments.push(new KingSegment(tail ? tail.x : this.x, tail ? tail.y : this.y));
+      }
+      this.segments.length = n;
+    }
+
+    update() {
+      if (!this._placed && width) this.place();
+      this.legTimer += 0.12;
+      if (Math.random() < 0.015) this.angle += (Math.random() - 0.5) * 1.0;
+
+      this.x += Math.cos(this.angle) * this.speed;
+      this.y += Math.sin(this.angle) * this.speed;
+
+      if (this.x < 10) { this.x = 10; this.angle = Math.PI - this.angle; }
+      if (this.x > width - 10) { this.x = width - 10; this.angle = Math.PI - this.angle; }
+      if (this.y < 10) { this.y = 10; this.angle = -this.angle; }
+      if (this.y > height - 10) { this.y = height - 10; this.angle = -this.angle; }
+
+      this.segments[0].x = this.x;
+      this.segments[0].y = this.y;
+      this.segments[0].angle = this.angle;
+
+      for (let i = 0; i < this.segments.length; i++) {
+        const seg = this.segments[i];
+        if (i > 0) {
+          const prev = this.segments[i - 1];
+          const dx = prev.x - seg.x;
+          const dy = prev.y - seg.y;
+          seg.angle = Math.atan2(dy, dx);
+          seg.x = prev.x - Math.cos(seg.angle) * this.segmentDist;
+          seg.y = prev.y - Math.sin(seg.angle) * this.segmentDist;
+        }
+      }
+    }
+
+    draw() {
+      ctx.strokeStyle = '#eab308';
+      ctx.lineWidth = 1.8;
+      for (let i = 0; i < this.segments.length - 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(this.segments[i].x, this.segments[i].y);
+        ctx.lineTo(this.segments[i + 1].x, this.segments[i + 1].y);
+        ctx.stroke();
+      }
+      for (let i = this.segments.length - 1; i >= 0; i--) {
+        this.segments[i].draw(this.legTimer + i * 1.5, i === 0);
+      }
+    }
+  }
+
+  const king = new KingBot(kingSegmentCount);
+
+  // Unlike every other packet on the site, this one is never fetched,
+  // carried, or removed -- it just permanently sits with the King.
+  function drawPermanentPacket() {
+    const px = width * 0.5;
+    const py = height * 0.85;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.shadowBlur = 6;
+    ctx.shadowColor = '#38bdf8';
+    ctx.fillStyle = '#0284c7';
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-6, -6, 12, 12);
+    ctx.fillRect(-5, -5, 10, 10);
+    ctx.restore();
+  }
+
+  function animateStage() {
+    if (width && height) {
+      ctx.clearRect(0, 0, width, height);
+      drawPermanentPacket();
+      king.update();
+      king.draw();
+    }
+    requestAnimationFrame(animateStage);
+  }
+  animateStage();
+
+  function updateSegmentLabel() {
+    const n = king.segments.length;
+    segmentCountEl.textContent = `${n} segment${n === 1 ? '' : 's'}${n >= MAX_SEG ? ' (max!)' : ''}`;
+  }
+  updateSegmentLabel();
+
+  // ---------------- Quiz ----------------
+  function renderQuestion() {
+    if (!questions.length) return;
+    answering = false;
+    feedbackEl.textContent = '';
+    feedbackEl.className = 'game-feedback';
+
+    const q = questions[questionIndex];
+    progressEl.textContent = `Question ${questionIndex + 1} of ${questions.length}`;
+    questionEl.textContent = q.q;
+
+    answersEl.innerHTML = '';
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'game-answer-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => handleAnswer(i, btn));
+      answersEl.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(pickedIndex, btnEl) {
+    if (answering) return;
+    answering = true;
+
+    const q = questions[questionIndex];
+    const buttons = Array.from(answersEl.children);
+    buttons.forEach(b => { b.disabled = true; });
+
+    if (pickedIndex === q.correct) {
+      btnEl.classList.add('correct');
+      feedbackEl.textContent = '✅ Correct!';
+      feedbackEl.className = 'game-feedback correct';
+
+      kingSegmentCount = Math.min(MAX_SEG, kingSegmentCount + 1);
+      king.setSegmentCount(kingSegmentCount);
+      updateSegmentLabel();
+      localStorage.setItem(STORAGE_SEG, String(kingSegmentCount));
+    } else {
+      btnEl.classList.add('wrong');
+      buttons[q.correct].classList.add('correct');
+      feedbackEl.textContent = '❌ Not quite — correct answer highlighted.';
+      feedbackEl.className = 'game-feedback wrong';
+    }
+
+    // Sequential 1->25 then loop, per the designed easy-to-hard ramp.
+    setTimeout(() => {
+      questionIndex = (questionIndex + 1) % questions.length;
+      localStorage.setItem(STORAGE_Q, String(questionIndex));
+      renderQuestion();
+    }, 1800);
+  }
+
+  fetch('trivia.json')
+    .then(r => r.json())
+    .then(data => {
+      questions = data;
+      if (questionIndex >= questions.length) questionIndex = 0;
+      renderQuestion();
+    })
+    .catch(err => {
+      questionEl.textContent = 'Could not load trivia questions.';
+      console.warn('Index Master: failed to load trivia.json', err);
+    });
+})();
+
+/* ================================================================
+   6. ROBOTS WELCOME (crawlers wander over the 3-column bot marquee)
    ================================================================ */
 (function robotsWelcomeMarquee() {
   // Same welcomed-bot names as robots.txt (the wildcard `*` there already
@@ -1220,7 +1505,7 @@ const sectionAnimators = {};
 })();
 
 /* ================================================================
-   6. NAV TRACK (fixed points, click to jump, periodic label flash)
+   7. NAV TRACK (fixed points, click to jump, periodic label flash)
    ================================================================ */
 (function navTrack() {
   const rungs = Array.from(document.querySelectorAll('.navrung'));

@@ -21,7 +21,7 @@
 <meta name="twitter:description" content="A STEM education web-lab for Deep Reinforcement Learning — weekly algorithms, attention-based transformers, computer vision, and the real research behind them.">
 <meta name="twitter:image" content="https://martinkaloev.github.io/BiteSizeRobotics/og-preview.png">
 
-<link rel="stylesheet" href="style.css?v=8">
+<link rel="stylesheet" href="style.css?v=10">
 </head>
 <body>
 
@@ -36,6 +36,7 @@
   <button class="navrung" data-target="section-cnn" data-label="Computer Vision" aria-label="Computer Vision"></button>
   <button class="navrung" data-target="section-pub" data-label="Publications" aria-label="Publications"></button>
   <button class="navrung" data-target="section-downloads" data-label="Code Downloads" aria-label="Code Downloads"></button>
+  <button class="navrung" data-target="section-game" data-label="Index Master" aria-label="Index Master"></button>
   <button class="navrung" data-target="section-robots" data-label="Robots Welcome" aria-label="Robots Welcome"></button>
   <div class="navflash" id="navFlash"></div>
 </nav>
@@ -53,7 +54,7 @@
 
     <h2 class="section-label">01 · Countdown &amp; Weekly Algorithm Wheel</h2>
 
-    <p class="clock-intro-text">Hi, this is my web-lab — a STEM education lab in my field, Deep Reinforcement Learning. Those little bots crawling around are friendly animated indexers, modeled after the AI crawlers that collect information across the web.<br><a class="clock-intro-yt" href="https://www.youtube.com/@BiteSizeRobotics" target="_blank" rel="noopener">▶ YouTube channel</a></p>
+    <p class="clock-intro-text">Hi, this is my web-lab — a STEM education lab in my field, Deep Reinforcement Learning. Those little bots crawling around are friendly animated indexers, modeled after the AI crawlers that collect information across the web.<br><a class="clock-intro-yt" href="https://www.youtube.com/@BiteSizeRobotics" target="_blank" rel="noopener">▶ YouTube channel</a><br><a class="clock-intro-yt" href="https://forms.gle/RMMxS8B2xZ4faMVF8" target="_blank" rel="noopener">📝 Leave a message</a></p>
 
     <div class="clock-widget-container">
       <div class="clock-flipper" id="clockFlipper">
@@ -292,9 +293,40 @@
     <p class="dl-note">🔒 Each archive is AES-256 encrypted (.7z) — you'll need 7-Zip, Keka, or The Unarchiver, plus the key handed out in class.</p>
   </section>
 
-  <!-- ================= 6. ROBOTS WELCOME ================= -->
+  <!-- ================= 6. INDEX MASTER (TRIVIA GAME) ================= -->
+  <section class="slide" id="section-game">
+    <h2 class="section-label">06 · Index Master</h2>
+
+    <div class="game-bg-grid"></div>
+
+    <div class="game-split-layout">
+
+      <!-- LEFT: KING INDEXER STAGE -->
+      <div class="game-stage-half">
+        <div class="game-stage-header">
+          <span>👑 King Indexer</span>
+          <span class="game-segment-count" id="gameSegmentCount">3 segments</span>
+        </div>
+        <div class="game-stage" id="gameStage">
+          <canvas id="kingBotCanvas"></canvas>
+        </div>
+        <p class="game-stage-note">Answer correctly to grow the King — max 28 segments.</p>
+      </div>
+
+      <!-- RIGHT: TRIVIA QUIZ -->
+      <div class="game-quiz-half">
+        <div class="game-quiz-progress" id="gameProgress">Question 1 of 25</div>
+        <p class="game-question" id="gameQuestion">Loading questions…</p>
+        <div class="game-answers" id="gameAnswers"></div>
+        <p class="game-feedback" id="gameFeedback"></p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= 7. ROBOTS WELCOME ================= -->
   <section class="slide" id="section-robots">
-    <h2 class="section-label">06 · Robots Welcome</h2>
+    <h2 class="section-label">07 · Robots Welcome</h2>
 
     <div class="rob-bg-grid"></div>
 
@@ -331,7 +363,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-<script src="cookie-consent.js?v=8"></script>
-<script src="script.js?v=8"></script>
+<script src="cookie-consent.js?v=10"></script>
+<script src="script.js?v=10"></script>
 </body>
 </html>
