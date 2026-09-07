@@ -53,7 +53,7 @@
     "q": "In natural gradient descent, parameter updates are performed along the steepest descent direction invariant to reparameterization. Which matrix is used to define the Riemannian metric manifold for this optimization?",
     "options": [
       "The Hessian matrix of the empirical risk \\(\\nabla^2 \\mathcal{L}(\\theta\\)).",
-      "The Fisher Information Matrix \\(F = \\mathbb{E}_{p_\\theta(x,y)}\\left[\\nabla_\\theta \\log p_\\theta(x,y) \\nabla_\\theta \\log p_\\theta(x,y)^T\\right\\)].",
+      "The Fisher Information Matrix \\(F = \\mathbb{E}_{p_\\theta(x,y)}\\left[\\nabla_\\theta \\log p_\\theta(x,y) \\nabla_\\theta \\log p_\\theta(x,y)^T\\right]\\).",
       "The uncentered covariance matrix of input activations across all layers.",
       "The Gram matrix of the feature vectors computed in reproducing kernel Hilbert space (RKHS)."
     ],
@@ -95,7 +95,7 @@
       "\\(\\nabla_{x_t} \\log q_t(x_t) = -\\frac{\\epsilon_\\theta(x_t, t)}{\\sqrt{1 - \\bar{\\alpha}_t}}\\)",
       "\\(\\nabla_{x_t} \\log q_t(x_t) = \\frac{\\epsilon_\\theta(x_t, t)}{\\sqrt{\\bar{\\alpha}_t}}\\)",
       "\\(\\nabla_{x_t} \\log q_t(x_t) = -\\epsilon_\\theta(x_t, t) \\cdot \\beta_t^2\\)",
-      "\\(\\nabla_{x_t} \\log q_t(x_t) = \\left( \\epsilon_\\theta(x_t, t) \\right)^T \\left( x_t - \\mu_t \\right\\))"
+      "\\(\\nabla_{x_t} \\log q_t(x_t) = \\left( \\epsilon_\\theta(x_t, t) \\right)^T \\left( x_t - \\mu_t \\right)\\)"
     ],
     "correct": 0
   },
@@ -140,7 +140,7 @@
     "correct": 1
   },
   {
-    "q": "In the InfoNCE loss used in contrastive representation learning (\\(\\mathcal{L}_{\\text{InfoNCE}} = -\\mathbb{E}\\left[\\log \\frac{\\exp(s(x, x^+)/\\tau)}{\\exp(s(x, x^+)/\\tau) + \\sum_{j} \\exp(s(x, x^-_j)/\\tau)}\\right\\)]), minimizing this loss is mathematically equivalent to maximizing:",
+    "q": "In the InfoNCE loss used in contrastive representation learning (\\(\\mathcal{L}_{\\text{InfoNCE}} = -\\mathbb{E}\\left[\\log \\frac{\\exp(s(x, x^+)/\\tau)}{\\exp(s(x, x^+)/\\tau) + \\sum_{j} \\exp(s(x, x^-_j)/\\tau)}\\right]\\)), minimizing this loss is mathematically equivalent to maximizing:",
     "options": [
       "A lower bound on the Mutual Information I(X; Y) between positive views.",
       "The Rényi divergence between negative sampling distributions.",
@@ -243,9 +243,9 @@
     "q": "Consider a distribution-free supervised learning setup with bounded loss. According to the PAC-Bayes Theorem (McAllester's bound), with probability at least \\(1 - \\delta\\) over the draw of training set S of size m, for any posterior distribution Q over the hypothesis space: What quantity upper-bounds the true generalization risk \\(\\mathcal{R}(Q\\)) relative to empirical risk \\(\\hat{\\mathcal{R}}_S(Q\\))?",
     "options": [
       "\\(\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\sqrt{\\frac{\\text{KL}(Q \\parallel P) + \\ln(2\\sqrt{m}/\\delta)}{2m}}\\) (where P is the prior chosen independently of S).",
-      "\\(\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\frac{\\text{VC-Dim}(\\mathcal{H})}{m} \\ln\\left(\\frac{m}{\\delta}\\right\\)).",
+      "\\(\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\frac{\\text{VC-Dim}(\\mathcal{H})}{m} \\ln\\left(\\frac{m}{\\delta}\\right)\\).",
       "\\(\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\frac{1}{\\sqrt{m}} \\sum_{i=1}^m \\mathbb{E}_{\\sigma}[\\sigma_i f(x_i\\))].",
-      "\\(\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\left( \\frac{\\text{Tr}(F^{-1})}{m} \\right) \\ln\\left(\\frac{1}{\\delta}\\right\\))."
+      "\\(\\mathcal{R}(Q) \\le \\hat{\\mathcal{R}}_S(Q) + \\left( \\frac{\\text{Tr}(F^{-1})}{m} \\right) \\ln\\left(\\frac{1}{\\delta}\\right)\\)."
     ],
     "correct": 0
   }
