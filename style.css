@@ -1460,6 +1460,218 @@ body {
 }
 
 /* ================================================================
+   8. ARTEFACTS (SELF-INDEXING EXPERIMENT)
+   ================================================================ */
+.art-bg-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image:
+    linear-gradient(to right, rgba(56, 189, 248, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+}
+
+/* Sits behind the header/cards (z-index 1 vs their 10) so the wandering
+   bots read as walking around/behind the 4 mini-pages, same layering idea
+   as .rob-crawl-canvas but reversed (there the canvas is on top, since
+   slide 7 has no cards to walk behind). */
+.art-crawl-canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.art-header {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 560px;
+  padding: 0 20px;
+  margin-bottom: 14px;
+}
+.art-header h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #f1f5f9;
+  text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+  margin-bottom: 6px;
+}
+.art-panel-tag {
+  display: inline-block;
+  color: #4ade80;
+  font-family: monospace;
+  font-size: 0.68rem;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+/* Was a modest fixed-px grid (~40% of the slide); now sized off the
+   viewport itself so the 4 cards actually fill most of the available
+   space (~90vw / ~78vh) instead of sitting small in the middle. */
+.art-grid {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 22px;
+  /* 10% bigger again on top of the previous pass. */
+  width: 99vw;
+  max-width: 1430px;
+  height: 86vh;
+  max-height: 836px;
+}
+
+.art-card {
+  background: #161f30;
+  border: 1.5px solid #1e293b;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+}
+/* Resting cards now already take up most of the slide, so hover/focus is
+   just a small lift + glow (not a scale-up) -- the big "pop" is click,
+   which fullscreens the card instead (see .art-card-expanded + the click
+   handler in artefactsCrawlers()/artefactsExpandCards() in script.js). */
+.art-card:hover,
+.art-card:focus-within {
+  transform: translateY(-4px);
+  border-color: #38bdf8;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), 0 0 18px rgba(56, 189, 248, 0.25);
+}
+.art-card:focus { outline: none; }
+
+.art-card-close {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid #1e293b;
+  background: #0f172a;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.art-card-close:hover { border-color: #38bdf8; color: #f1f5f9; }
+
+.art-card-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  flex-shrink: 0;
+  padding-right: 24px;
+}
+
+.art-card-body {
+  /* 10% smaller, paired with the bigger card above -- together they're
+     meant to make the text fit without needing its own scrollbar. Scroll
+     wheel/touch input over an internally-scrollable card was fighting the
+     site's own full-page scroll-snap navigation instead of moving to the
+     next slide, so getting rid of the need to scroll in here matters more
+     than it would on an ordinary (non-scroll-snapped) page. overflow-y:
+     auto stays only as a fallback for any viewport where it still doesn't
+     quite fit, not as the expected way to read a card. */
+  font-size: 0.68rem;
+  line-height: 1.42;
+  color: #94a3b8;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
+}
+.art-card-body p { margin-bottom: 8px; }
+.art-card-body ul { padding-left: 18px; margin-bottom: 8px; }
+.art-card-body strong { color: #e2e8f0; }
+
+/* Slightly heavier than the regular body copy around it -- calling out
+   that this slide is itself the experiment, not just describing one. */
+.art-callout {
+  font-weight: 600;
+  color: #e2e8f0;
+  border-left: 2px solid #38bdf8;
+  padding-left: 10px;
+}
+
+.art-card-photo .art-card-body img {
+  width: 100%;
+  border-radius: 8px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* Click-to-fullscreen: JS toggles this class + shows #artBackdrop instead
+   of navigating anywhere, so it works the same on every slide-viewport
+   size without a separate mobile path. */
+.art-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(3, 7, 18, 0.78);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.art-backdrop.visible { opacity: 1; pointer-events: auto; }
+
+.art-card.art-card-expanded {
+  position: fixed;
+  inset: 5vh 6vw;
+  z-index: 901;
+  transform: none;
+  cursor: default;
+  padding: 26px 30px;
+}
+.art-card.art-card-expanded:hover { transform: none; }
+.art-card.art-card-expanded .art-card-close { display: flex; }
+.art-card.art-card-expanded .art-card-title { font-size: 1.35rem; padding-right: 40px; }
+.art-card.art-card-expanded .art-card-body { font-size: 1.02rem; line-height: 1.65; }
+
+@media (max-width: 860px) {
+  .art-header { top: 36px; margin-bottom: 12px; }
+  /* Same lesson as every other split/grid layout on this site: flex:none
+     (n/a here, it's grid) plus an explicit max-height + overflow-y:auto is
+     what actually lets 4 full-text cards fit inside the slide's normal
+     100vh instead of blowing past it -- #section-artefacts itself keeps
+     the base .slide 100vh, only this inner grid scrolls. */
+  .art-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    gap: 12px;
+    width: 100%;
+    height: auto;
+    max-height: 84vh;
+    padding: 0 16px;
+    overflow-y: auto;
+  }
+  .art-card { min-height: 187px; max-height: 286px; }
+  .art-card-title { font-size: 0.76rem; }
+  .art-card-body { font-size: 0.58rem; }
+  .art-card:hover,
+  .art-card:focus-within { transform: translateY(-2px); }
+  .art-card.art-card-expanded {
+    inset: 4vh 4vw;
+    padding: 20px 18px;
+  }
+  .art-card.art-card-expanded .art-card-title { font-size: 1.05rem; }
+  .art-card.art-card-expanded .art-card-body { font-size: 0.85rem; }
+}
+
+/* ================================================================
    COOKIE CONSENT GATE
    ================================================================ */
 .gate {

@@ -1,3 +1,4 @@
 # Local deployment tooling -- not part of the published site
 push.sh
 .cache-version
+NOTES.md

@@ -1551,7 +1551,208 @@ const sectionAnimators = {};
 })();
 
 /* ================================================================
-   7. NAV TRACK (fixed points, click to jump, periodic label flash)
+   7. ARTEFACTS (ambient crawlers wandering behind the 4 experiment cards)
+   ================================================================ */
+(function artefactsCrawlers() {
+  const stage = document.getElementById('section-artefacts');
+  const canvas = document.getElementById('artCrawlCanvas');
+  if (!stage || !canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  let width, height;
+  function resize() {
+    const rect = stage.getBoundingClientRect();
+    width = canvas.width = rect.width;
+    height = canvas.height = rect.height;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Same dome+legs body as every other bot on this site, trimmed down: no
+  // fetch/carry state machine here at all -- this slide only asked for
+  // bots ambiently walking the background, not indexing anything.
+  class Segment {
+    constructor(x, y, radius = 7) {
+      this.x = x;
+      this.y = y;
+      this.angle = 0;
+      this.radius = radius;
+    }
+    draw(legPhase, isHead) {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.angle);
+
+      const legL = Math.sin(legPhase) * 4.5;
+      const legR = Math.cos(legPhase) * 4.5;
+
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2;
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(0, -this.radius * 0.7);
+      ctx.lineTo(-this.radius * 1.6, -this.radius * 1.8 + legL);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, this.radius * 0.7);
+      ctx.lineTo(-this.radius * 1.6, this.radius * 1.8 + legR);
+      ctx.stroke();
+
+      ctx.shadowBlur = 4;
+      ctx.shadowColor = '#0284c7';
+      ctx.fillStyle = '#0f172a';
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.2;
+
+      ctx.beginPath();
+      ctx.arc(0, 0, this.radius, -Math.PI / 2, Math.PI / 2, false);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      if (isHead) {
+        ctx.fillStyle = '#22d3ee';
+        ctx.beginPath();
+        ctx.arc(this.radius * 0.45, 0, 1.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+  }
+
+  class AmbientBot {
+    constructor() {
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.angle = Math.random() * Math.PI * 2;
+      this.speed = 0.4 + Math.random() * 0.4;
+      this.segmentDist = 11;
+      this.segments = [];
+      for (let i = 0; i < 3; i++) {
+        this.segments.push(new Segment(this.x - i * this.segmentDist, this.y));
+      }
+      this.legTimer = Math.random() * 10;
+    }
+
+    update() {
+      this.legTimer += 0.15;
+      if (Math.random() < 0.02) this.angle += (Math.random() - 0.5) * 1.2;
+
+      this.x += Math.cos(this.angle) * this.speed;
+      this.y += Math.sin(this.angle) * this.speed;
+
+      if (this.x < 8) { this.x = 8; this.angle = Math.PI - this.angle; }
+      if (this.x > width - 8) { this.x = width - 8; this.angle = Math.PI - this.angle; }
+      if (this.y < 8) { this.y = 8; this.angle = -this.angle; }
+      if (this.y > height - 8) { this.y = height - 8; this.angle = -this.angle; }
+
+      this.segments[0].x = this.x;
+      this.segments[0].y = this.y;
+      this.segments[0].angle = this.angle;
+      for (let i = 1; i < this.segments.length; i++) {
+        const seg = this.segments[i];
+        const prev = this.segments[i - 1];
+        const dx = prev.x - seg.x;
+        const dy = prev.y - seg.y;
+        seg.angle = Math.atan2(dy, dx);
+        seg.x = prev.x - Math.cos(seg.angle) * this.segmentDist;
+        seg.y = prev.y - Math.sin(seg.angle) * this.segmentDist;
+      }
+    }
+
+    draw() {
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 1.4;
+      for (let i = 0; i < this.segments.length - 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(this.segments[i].x, this.segments[i].y);
+        ctx.lineTo(this.segments[i + 1].x, this.segments[i + 1].y);
+        ctx.stroke();
+      }
+      for (let i = this.segments.length - 1; i >= 0; i--) {
+        this.segments[i].draw(this.legTimer + i * 1.5, i === 0);
+      }
+    }
+  }
+
+  const bots = [];
+  for (let i = 0; i < 6; i++) bots.push(new AmbientBot());
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+    bots.forEach(b => { b.update(); b.draw(); });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+/* ================================================================
+   7b. ARTEFACTS CARD EXPAND (click a card -> fullscreen; click again,
+       the close button, the backdrop, or Escape -> back to the grid)
+   ================================================================ */
+(function artefactsCardExpand() {
+  const cards = Array.from(document.querySelectorAll('#artGrid .art-card'));
+  const backdrop = document.getElementById('artBackdrop');
+  if (!cards.length || !backdrop) return;
+
+  let current = null;
+
+  // .art-grid has its own position:relative + z-index:10 (needed to sit
+  // above the bg grid/crawl canvas), which means it establishes a
+  // stacking context -- a child of it can NEVER paint above a sibling
+  // like #artBackdrop no matter how high the child's own z-index goes,
+  // because the whole .art-grid layer is stacked at level 10 first. That
+  // was the actual bug behind "the page just dims and the card is barely
+  // readable": the backdrop was painting over the expanded card, not
+  // behind it. Reparenting the card straight onto <body> while it's
+  // expanded escapes that trap entirely; putting it back where it came
+  // from (using the saved placeholder) on collapse undoes it cleanly.
+  function collapse() {
+    if (!current) return;
+    const { card, placeholder } = current;
+    card.classList.remove('art-card-expanded');
+    placeholder.replaceWith(card);
+    backdrop.classList.remove('visible');
+    current = null;
+  }
+
+  function expand(card) {
+    if (current) collapse();
+    const placeholder = document.createComment('art-card-slot');
+    card.replaceWith(placeholder);
+    document.body.appendChild(card);
+    card.classList.add('art-card-expanded');
+    backdrop.classList.add('visible');
+    current = { card, placeholder };
+  }
+
+  cards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.art-card-close')) { collapse(); return; }
+      // Already open -- let clicks inside it scroll/select text normally
+      // instead of instantly closing on the next click.
+      if (card.classList.contains('art-card-expanded')) return;
+      expand(card);
+    });
+    card.addEventListener('keydown', (e) => {
+      if (e.target !== card) return; // let scrolling/selection inside the card body alone
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        expand(card);
+      }
+    });
+  });
+
+  backdrop.addEventListener('click', collapse);
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') collapse();
+  });
+})();
+
+/* ================================================================
+   8. NAV TRACK (fixed points, click to jump, periodic label flash)
    ================================================================ */
 (function navTrack() {
   const rungs = Array.from(document.querySelectorAll('.navrung'));
