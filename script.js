@@ -308,7 +308,12 @@ const sectionAnimators = {};
 /* ================================================================
    1. CLOCK / WHEEL WIDGET (from cloclky clockky.html + spiny , spinny .html)
    ================================================================ */
-(function clockWheelWidget() {
+(function clockCountdownAndFlip() {
+  // The spin wheel itself (segments, weights, drawing, spinning, link
+  // pop-open) lives in spinner.js. This IIFE only owns the countdown timer
+  // and the card-flip animation that shows/hides the wheel side; it reads
+  // window.wheelSpinnerState.isSpinning (set by spinner.js) so the
+  // auto-flip pauses while a spin is in progress.
   const targetDate = new Date('2026-11-11T12:00:00+02:00').getTime();
   const clockText = document.getElementById('clockText');
 
@@ -334,12 +339,12 @@ const sectionAnimators = {};
   const flipper = document.getElementById('clockFlipper');
   const swapBar = document.getElementById('clockSwapBar');
   let isFlipped = false;
-  let isSpinning = false;
   let elapsed = 0;
   const SWAP_TIME = 10000;
+  const spinState = window.wheelSpinnerState;
 
   setInterval(() => {
-    if (isSpinning) return;
+    if (spinState.isSpinning) return;
 
     elapsed += 100;
     const progress = (elapsed / SWAP_TIME) * 100;
@@ -356,7 +361,7 @@ const sectionAnimators = {};
   // out the full 10s auto-flip.
   const clockFace = document.querySelector('.clock-clock-side');
   clockFace.addEventListener('click', () => {
-    if (isFlipped || isSpinning) return;
+    if (isFlipped || spinState.isSpinning) return;
     elapsed = 0;
     isFlipped = true;
     flipper.classList.add('flipped');
@@ -371,119 +376,6 @@ const sectionAnimators = {};
       swapBar.style.width = '0%';
     }
   };
-
-  const canvas = document.getElementById('clockWheelCanvas');
-  const ctx = canvas.getContext('2d');
-  const pointer = document.getElementById('clockPointer');
-  const wheelBubble = document.getElementById('clockWheelBubble');
-  const spinBtn = document.getElementById('clockSpinBtn');
-  const revealBtn = document.getElementById('clockRevealBtn');
-
-  // Six places the wheel can land, per the task's "DRL algorithm of the week 1 to 6".
-  const segments = [
-    { label: 'DRL ALGO #1', color: '#0284c7' },
-    { label: 'DRL ALGO #2', color: '#9333ea' },
-    { label: 'DRL ALGO #3', color: '#ea580c' },
-    { label: 'DRL ALGO #4', color: '#16a34a' },
-    { label: 'DRL ALGO #5', color: '#0891b2' },
-    { label: 'DRL ALGO #6', color: '#4f46e5' }
-  ];
-
-  const numSegs = segments.length;
-  const arc = (2 * Math.PI) / numSegs;
-  let currentAngle = 0;
-
-  function drawWheel() {
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const radius = cx - 6;
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (let i = 0; i < numSegs; i++) {
-      const angle = currentAngle + i * arc;
-      ctx.beginPath();
-      ctx.fillStyle = segments[i].color;
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, radius, angle, angle + arc);
-      ctx.lineTo(cx, cy);
-      ctx.fill();
-
-      ctx.strokeStyle = '#0f172a';
-      ctx.lineWidth = 2.5;
-      ctx.stroke();
-
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(angle + arc / 2);
-      ctx.textAlign = 'right';
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 13px sans-serif';
-      ctx.shadowColor = 'rgba(0,0,0,0.8)';
-      ctx.shadowBlur = 4;
-      ctx.fillText(segments[i].label, radius - 16, 4);
-      ctx.restore();
-    }
-
-    for (let i = 0; i < numSegs * 2; i++) {
-      const pegAngle = currentAngle + i * (arc / 2);
-      const px = cx + Math.cos(pegAngle) * (radius - 5);
-      const py = cy + Math.sin(pegAngle) * (radius - 5);
-      ctx.beginPath();
-      ctx.arc(px, py, 3, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
-      ctx.fill();
-    }
-  }
-  drawWheel();
-
-  spinBtn.addEventListener('click', () => {
-    if (isSpinning) return;
-    isSpinning = true;
-    spinBtn.disabled = true;
-    revealBtn.classList.remove('visible');
-    wheelBubble.textContent = 'SPINNING... GOOD LUCK!';
-
-    const extraRounds = 5 + Math.random() * 4;
-    const randomStop = Math.random() * Math.PI * 2;
-    const totalSpinAngle = extraRounds * Math.PI * 2 + randomStop;
-
-    const duration = 4500;
-    const startAngle = currentAngle;
-    const startTime = performance.now();
-
-    function animateSpin(now) {
-      const elapsedSpin = now - startTime;
-      const t = Math.min(1, elapsedSpin / duration);
-
-      const easeOut = 1 - Math.pow(1 - t, 3);
-      currentAngle = startAngle + totalSpinAngle * easeOut;
-
-      if (Math.sin(currentAngle * numSegs) > 0.8) {
-        pointer.classList.add('wiggle');
-      } else {
-        pointer.classList.remove('wiggle');
-      }
-
-      drawWheel();
-
-      if (t < 1) {
-        requestAnimationFrame(animateSpin);
-      } else {
-        isSpinning = false;
-        spinBtn.disabled = false;
-        pointer.classList.remove('wiggle');
-
-        const normalized = (Math.PI - (currentAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-        const winningIndex = Math.floor(normalized / arc) % numSegs;
-        const winner = segments[winningIndex];
-
-        wheelBubble.textContent = `LANDED ON: ${winner.label}!`;
-        revealBtn.classList.add('visible');
-      }
-    }
-    requestAnimationFrame(animateSpin);
-  });
 })();
 
 /* ================================================================
