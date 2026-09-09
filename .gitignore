@@ -1,5 +1,7 @@
 # Local deployment tooling -- not part of the published site
 push.sh
 add-video.sh
+commit-history.sh
+commit-history_*.txt
 .cache-version
 NOTES.md

@@ -68,6 +68,41 @@ window.wheelSpinnerState = { isSpinning: false };
   let currentAngle = 0;
 
   // ------------------------------------------------------------
+  // secureRandom()
+  //
+  // WHAT IT DOES: hands back a random decimal from 0 up to (but not
+  //   including) 1 -- the same shape of value Math.random() gives -- but
+  //   drawn from the browser's cryptographic generator
+  //   (crypto.getRandomValues) instead. That generator is seeded from the
+  //   operating system's entropy pool, so the numbers are much higher
+  //   quality and less predictable than Math.random().
+  //
+  //   Note: this site is fully static, so the spin still can't be
+  //   server-controlled or certified -- a visitor with dev tools can
+  //   always force an outcome. This only makes the draw itself as good as
+  //   the browser can give.
+  //
+  // INPUT: none.
+  //
+  // OUTPUT: a number n with 0 <= n < 1. If the crypto API somehow isn't
+  //   there (very old browser, unusual embedding), it quietly falls back
+  //   to Math.random() so the wheel still works.
+  //
+  // WHERE IT GOES: used by pickIndex() (to roll the weighted winner) and
+  //   by the SPIN click handler (for the landing jitter and the number of
+  //   extra rotations).
+  // ------------------------------------------------------------
+  function secureRandom() {
+    const cryptoObj = window.crypto || window.msCrypto;
+    if (cryptoObj && typeof cryptoObj.getRandomValues === 'function') {
+      const buf = new Uint32Array(1);
+      cryptoObj.getRandomValues(buf);
+      return buf[0] / 4294967296; // divide by 2^32 -> [0, 1)
+    }
+    return Math.random();
+  }
+
+  // ------------------------------------------------------------
   // buildAlgoSegments()
   //
   // WHAT IT DOES: builds the 6 fixed "DRL ALGO #1" through "#6" wedges.
@@ -352,7 +387,7 @@ window.wheelSpinnerState = { isSpinning: false };
     }
 
     const total = pool.reduce((sum, e) => sum + e.weight, 0);
-    let roll = Math.random() * total;
+    let roll = secureRandom() * total;
     for (const e of pool) {
       roll -= e.weight;
       if (roll < 0) return e.i;
@@ -508,11 +543,15 @@ window.wheelSpinnerState = { isSpinning: false };
     // solved backwards for the currentAngle that produces our chosen index.
     // A little jitter within the segment (not dead center) keeps it looking
     // like a real spin rather than a rigged laser-point stop.
-    const jitter = 0.15 + Math.random() * 0.7; // stays clear of both edges
+    const jitter = 0.15 + secureRandom() * 0.7; // stays clear of both edges
     const targetNormalized = (winningIndex + jitter) * arc;
     const targetAngleMod = (3 * Math.PI - targetNormalized + Math.PI * 2 * 4) % (Math.PI * 2);
 
-    const extraRounds = 5 + Math.random() * 4;
+    // Whole number of extra turns. This MUST be an integer: any fractional
+    // part becomes a partial rotation that gets added on top of
+    // deltaToTarget, which would leave the wheel visually stopped on a
+    // random wedge instead of the one pickIndex() already chose.
+    const extraRounds = 5 + Math.floor(secureRandom() * 4); // 5..8 whole turns
     const startAngle = currentAngle;
     const startAngleMod = ((startAngle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
     const deltaToTarget = ((targetAngleMod - startAngleMod) + Math.PI * 2) % (Math.PI * 2);
